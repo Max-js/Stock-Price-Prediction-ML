@@ -4,13 +4,18 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
+from datetime import datetime
 
 print("Welcome to the Northwest Investment stock analysis tool!")
 
 ticker = input("Please input a ticker to analyze: ").upper()
 
+def getRollingEndDate():
+    current_datetime = datetime.now()
+    return f"{current_datetime.year}-{current_datetime.month}-{current_datetime.day}"
+print(getRollingEndDate())
 #Should date range be input or hard coded?
-data = yf.download(ticker, start="2024-01-01", end="2025-01-01")
+data = yf.download(ticker, start="2024-01-01", end=getRollingEndDate())
 data = data[['Close']]
 
 #Normalize the data.
@@ -71,4 +76,7 @@ plt.xlabel('Date')
 plt.ylabel('Price')
 plt.legend()
 plt.show()
+
+#Add graphic / print stats that evaluate model performance
+#Confusion matrix? Linear regression? 
                       
