@@ -115,7 +115,7 @@ plt.grid(alpha=0.3)
 plt.show()
 
 #Visualize model performance metrics
-metrics = ['MAE', 'RMSE', 'R-squared']
+metrics = ['MAE', 'RMSE', 'R-Squared']
 values = [mean_absolute_err, root_mean_squared_err, r2]
 
 plt.figure(figsize=(8, 6))
