@@ -29,7 +29,7 @@ data = data[['Close']]
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(data.to_numpy())
 
-#Use last 90 days to predict the next day
+#Determine how many previous days to use to predict the next day
 length_of_historical_data = 60
 
 x = []
@@ -62,9 +62,15 @@ model = Sequential([
 model.compile(optimizer='adam', loss='mean_squared_error')
 fit_data = model.fit(x_train, y_train, epochs=20, batch_size=32, validation_data=(x_test, y_test))
 
+#Make Predictions
 predicted_prices = model.predict(x_test)
 predicted_prices = scaler.inverse_transform(predicted_prices.reshape(-1, 1))
 actual_prices = scaler.inverse_transform(y_test.reshape(-1, 1))
+
+#Calculate metrics based on actual and predicted prices
+mean_absolute_err = mean_absolute_error(actual_prices, predicted_prices)
+root_mean_squared_err = np.sqrt(mean_squared_error(actual_prices, predicted_prices))
+r2 = r2_score(actual_prices, predicted_prices)
 
 buy_signals = []
 for i in range(1, len(predicted_prices)):
@@ -72,6 +78,7 @@ for i in range(1, len(predicted_prices)):
     if predicted_prices[i] > actual_prices[i]:
         buy_signals.append((data.index[-len(y_test)+i], actual_prices[i], predicted_prices[i]))
 
+#Plot actual vs. predicted values, buy signals
 plt.figure(figsize=(12, 7))
 plot_dates = np.array(data.index[-len(y_test):])
 plt.plot(plot_dates, actual_prices, color='blue', label="Actual Prices", linewidth=2)
@@ -94,4 +101,29 @@ plt.ylabel('Price', fontsize=12)
 plt.legend(fontsize=10)
 plt.grid(alpha=0.3)
 plt.show()
-                      
+
+#Plot training and validation loss
+plt.figure(figsize=(10, 6))
+plt.plot(fit_data.history['loss'], label='Training Loss', color='blue')
+if 'val_loss' in fit_data.history:
+    plt.plot(fit_data.history['val_loss'], label='Validation Loss', color='orange')
+plt.title('Model Loss Over Epochs', fontsize=16)
+plt.xlabel('Epochs', fontsize=12)
+plt.ylabel('Loss', fontsize=12)
+plt.legend(fontsize=10)
+plt.grid(alpha=0.3)
+plt.show()
+
+#Visualize model performance metrics
+metrics = ['MAE', 'RMSE', 'R-squared']
+values = [mean_absolute_err, root_mean_squared_err, r2]
+
+plt.figure(figsize=(8, 6))
+plt.bar(metrics, values, color=['blue', 'orange', 'green'], alpha=0.7)
+plt.title('Model Performance Metrics', fontsize=16)
+plt.ylabel('Value', fontsize=12)
+for i, v in enumerate(values):
+    plt.text(i, v + 0.01, f"{v:.4f}", ha='center', fontsize=12, color='black')
+
+plt.grid(alpha=0.3)
+plt.show()
