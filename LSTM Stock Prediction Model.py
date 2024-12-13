@@ -86,14 +86,17 @@ latest_signal_date = buy_signals[len(buy_signals)-1][0].date()
 latest_predicted_price = buy_signals[len(buy_signals)-1][2][0]
 latest_actual_price = buy_signals[len(buy_signals)-1][1][0]
 if (latest_predicted_price > latest_actual_price) & (current_datetime.date() == latest_signal_date):
-    print(f"\033[1;32m{ticker} is potentially a good buy at this time.\033[0m")
+    message = f"{ticker} is potentially a good buy at this time."
+    message_color = "green"
 else:
-    print(f"\033[1;31m{ticker} is most likely not a good buy at this time.\033[0m")
+    message = f"{ticker} is most likely not a good buy at this time."
+    message_color = "red"
 
 #Set up dashboard layout
 fig = plt.figure(figsize=(16, 12))
 gs = gridspec.GridSpec(2, 2, width_ratios=[2, 1], height_ratios=[1, 1], wspace=0.3, hspace=0.3)
 plot_dates = np.array(data.index[-len(y_test):])
+fig.text(0.5, 0.95, message, ha='center', va='center', fontsize=16, color=message_color, fontweight='bold')
 
 #Graph 1: Plot actual vs. predicted values, buy signals
 graph1 = fig.add_subplot(gs[0, 0])
