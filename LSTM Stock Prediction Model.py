@@ -4,6 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib.ticker import MaxNLocator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
 from datetime import datetime
@@ -29,13 +30,12 @@ data = data[['Close']]
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(data.to_numpy())
 
-#Determine how many previous days to use to predict the next day
-length_of_historical_data = 60
+len_of_prediction_data = 60 #Determine how many previous days data to use to make predictions (y data)
 
 x = []
 y = []
-for i in range(length_of_historical_data, len(scaled_data)):
-    x.append(scaled_data[i - length_of_historical_data:i])
+for i in range(len_of_prediction_data, len(scaled_data)):
+    x.append(scaled_data[i - len_of_prediction_data:i])
     y.append(scaled_data[i, 0])
 
 x = np.array(x)
@@ -43,7 +43,8 @@ y = np.array(y)
 x = np.reshape(x, (x.shape[0], x.shape[1], 1))
 
 #Split data into train / test sets
-train_size = int(len(x) * 0.8)
+len_of_historical_data = 0.7 #Determine how much historical data to use for training (x data)
+train_size = int(len(x) * len_of_historical_data)
 x_train = x[:train_size]
 x_test = x[train_size:]
 y_train = y[:train_size]
@@ -59,8 +60,10 @@ model = Sequential([
     Dense(units=1)
 ])
 
+#Number of iterations over the data - changes graph x axis scale to match.
+epochs = 20
 model.compile(optimizer='adam', loss='mean_squared_error')
-fit_data = model.fit(x_train, y_train, epochs=20, batch_size=32, validation_data=(x_test, y_test))
+fit_data = model.fit(x_train, y_train, epochs=epochs, batch_size=32, validation_data=(x_test, y_test))
 
 #Make Predictions
 predicted_prices = model.predict(x_test)
@@ -105,13 +108,13 @@ plt.show()
 #Plot training and validation loss
 plt.figure(figsize=(10, 6))
 plt.plot(fit_data.history['loss'], label='Training Loss', color='blue')
-if 'val_loss' in fit_data.history:
-    plt.plot(fit_data.history['val_loss'], label='Validation Loss', color='orange')
+plt.plot(fit_data.history['val_loss'], label='Validation Loss', color='orange')
 plt.title('Model Loss Over Epochs', fontsize=16)
 plt.xlabel('Epochs', fontsize=12)
 plt.ylabel('Loss', fontsize=12)
 plt.legend(fontsize=10)
 plt.grid(alpha=0.3)
+plt.xticks(range(0, epochs, 1))
 plt.show()
 
 #Visualize model performance metrics
@@ -127,3 +130,6 @@ for i, v in enumerate(values):
 
 plt.grid(alpha=0.3)
 plt.show()
+
+#Print UI stuff based on results? Buy - yes or no? Prediction worthiness (r2 value decent?)? 
+#Check that it meets guidelines
