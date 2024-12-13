@@ -81,6 +81,15 @@ for i in range(1, len(predicted_prices)):
     if predicted_prices[i] > actual_prices[i]:
         buy_signals.append((data.index[-len(y_test)+i], actual_prices[i], predicted_prices[i]))
 
+#Determine whether stock is a good buy or not
+latest_signal_date = buy_signals[len(buy_signals)-1][0].date()
+latest_predicted_price = buy_signals[len(buy_signals)-1][2][0]
+latest_actual_price = buy_signals[len(buy_signals)-1][1][0]
+if (latest_predicted_price > latest_actual_price) & (current_datetime.date() == latest_signal_date):
+    print(f"\033[1;32m{ticker} is potentially a good buy at this time.\033[0m")
+else:
+    print(f"\033[1;31m{ticker} is most likely not a good buy at this time.\033[0m")
+
 #Plot actual vs. predicted values, buy signals
 plt.figure(figsize=(12, 7))
 plot_dates = np.array(data.index[-len(y_test):])
@@ -130,6 +139,3 @@ for i, v in enumerate(values):
 
 plt.grid(alpha=0.3)
 plt.show()
-
-#Print UI stuff based on results? Buy - yes or no? Prediction worthiness (r2 value decent?)? 
-#Check that it meets guidelines
