@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from matplotlib.ticker import MaxNLocator
+import matplotlib.gridspec as gridspec
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
 from datetime import datetime
@@ -90,52 +90,54 @@ if (latest_predicted_price > latest_actual_price) & (current_datetime.date() == 
 else:
     print(f"\033[1;31m{ticker} is most likely not a good buy at this time.\033[0m")
 
-#Plot actual vs. predicted values, buy signals
-plt.figure(figsize=(12, 7))
+#Set up dashboard layout
+fig = plt.figure(figsize=(16, 12))
+gs = gridspec.GridSpec(2, 2, width_ratios=[2, 1], height_ratios=[1, 1], wspace=0.3, hspace=0.3)
 plot_dates = np.array(data.index[-len(y_test):])
-plt.plot(plot_dates, actual_prices, color='blue', label="Actual Prices", linewidth=2)
-plt.plot(plot_dates, predicted_prices, color='red', label="Predicted Prices", linestyle='--')
+
+#Graph 1: Plot actual vs. predicted values, buy signals
+graph1 = fig.add_subplot(gs[0, 0])
+graph1.plot(plot_dates, actual_prices, color='blue', label="Actual Prices", linewidth=2)
+graph1.plot(plot_dates, predicted_prices, color='red', label="Predicted Prices", linestyle='--')
 
 labeled = False
 for signal in buy_signals:
     if labeled == False:
-        plt.scatter(signal[0], signal[1], color='green', label="Buy Signal", marker='^', alpha=0.7)
+        graph1.scatter(signal[0], signal[1], color='green', label="Buy Signal", marker='^', alpha=0.7)
         labeled = True
     else:
-        plt.scatter(signal[0], signal[1], color='green', marker='^', alpha=0.7)
+        graph1.scatter(signal[0], signal[1], color='green', marker='^', alpha=0.7)
 
-plt.title(f'{ticker} Stock Price Prediction', fontsize=16)
-plt.xlabel('Date', fontsize=12)
-plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-plt.xticks(rotation=45)
-plt.ylabel('Price', fontsize=12)
-plt.legend(fontsize=10)
-plt.grid(alpha=0.3)
-plt.show()
+graph1.set_title(f'{ticker} Stock Price Prediction', fontsize=16)
+graph1.set_xlabel('Date', fontsize=12)
+graph1.xaxis.set_major_locator(mdates.DayLocator(interval=3))
+graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+graph1.tick_params(axis='x', rotation=45)
+graph1.set_ylabel('Price', fontsize=12)
+graph1.legend(fontsize=10)
+graph1.grid(alpha=0.3)
 
-#Plot training and validation loss
-plt.figure(figsize=(10, 6))
-plt.plot(fit_data.history['loss'], label='Training Loss', color='blue')
-plt.plot(fit_data.history['val_loss'], label='Validation Loss', color='orange')
-plt.title('Model Loss Over Epochs', fontsize=16)
-plt.xlabel('Epochs', fontsize=12)
-plt.ylabel('Loss', fontsize=12)
-plt.legend(fontsize=10)
-plt.grid(alpha=0.3)
-plt.xticks(range(0, epochs, 1))
-plt.show()
+#Graph 2: Plot training and validation loss
+graph2 = fig.add_subplot(gs[1, 0])
+graph2.plot(fit_data.history['loss'], label='Training Loss', color='blue')
+graph2.plot(fit_data.history['val_loss'], label='Validation Loss', color='orange')
+graph2.set_title('Model Loss Over Epochs', fontsize=16)
+graph2.set_xlabel('Epochs', fontsize=12)
+graph2.set_ylabel('Loss', fontsize=12)
+graph2.legend(fontsize=10)
+graph2.grid(alpha=0.3)
+graph2.set_xticks(range(0, epochs, 1))
 
-#Visualize model performance metrics
+#Graph 3: Visualize model performance metrics
 metrics = ['MAE', 'RMSE', 'R-Squared']
 values = [mean_absolute_err, root_mean_squared_err, r2]
 
-plt.figure(figsize=(8, 6))
-plt.bar(metrics, values, color=['blue', 'orange', 'green'], alpha=0.7)
-plt.title('Model Performance Metrics', fontsize=16)
-plt.ylabel('Value', fontsize=12)
+graph3 = fig.add_subplot(gs[:, 1])
+graph3.bar(metrics, values, color=['blue', 'orange', 'green'], alpha=0.7)
+graph3.set_title('Model Performance Metrics', fontsize=16)
+graph3.set_ylabel('Value', fontsize=12)
 for i, v in enumerate(values):
-    plt.text(i, v + 0.01, f"{v:.4f}", ha='center', fontsize=12, color='black')
+    graph3.text(i, v + 0.01, f"{v:.4f}", ha='center', fontsize=12, color='black')
+graph3.grid(alpha=0.3)
 
-plt.grid(alpha=0.3)
 plt.show()
