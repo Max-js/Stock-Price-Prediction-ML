@@ -22,16 +22,16 @@ print("\033[1;32mWelcome to the Northwest Investment stock analysis tool!\033[0m
 
 current_datetime = datetime.now()
 
-def getRollingEndDate():
+def get_rolling_end_date():
     return f"{current_datetime.year}-{current_datetime.month}-{current_datetime.day+1}"
 
-def getRollingStartDate():
+def get_rolling_start_date():
     start_time = current_datetime - relativedelta(years=1)
     return f"{start_time.year}-{start_time.month}-{start_time.day}"
 
-def getStockData(ticker):
+def get_stock_data(ticker):
     try: 
-        data = yf.download(ticker, start=getRollingStartDate(), end=getRollingEndDate())
+        data = yf.download(ticker, start=get_rolling_start_date(), end=get_rolling_end_date())
         if data.empty:
             raise ValueError
         return data
@@ -41,7 +41,7 @@ def getStockData(ticker):
 
 while True:
     ticker = input("\033[1;32mPlease input a ticker to analyze: \033[0m").upper()
-    data = getStockData(ticker)
+    data = get_stock_data(ticker)
     
     if data is not None:
         data = data[['Close']]
