@@ -11,7 +11,7 @@ import matplotlib.dates as mdates
 import matplotlib.gridspec as gridspec
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 #Suppress pandas future warnings and yfinance error messages in favor of local error handling
@@ -23,18 +23,19 @@ print("\033[1;32mWelcome to the Northwest Investment stock analysis tool!\033[0m
 current_datetime = datetime.now()
 
 def get_rolling_end_date():
-    return f"{current_datetime.year}-{current_datetime.month}-{current_datetime.day+1}"
+    tomorrow = current_datetime + timedelta(days=1)
+    return tomorrow.strftime("%Y-%m-%d")
 
 def get_rolling_start_date():
-    start_time = current_datetime - relativedelta(years=1)
-    return f"{start_time.year}-{start_time.month}-{start_time.day}"
+    start_time = current_datetime - relativedelta(years=2)
+    return start_time.strftime("%Y-%m-%d")
 
 def get_stock_data(ticker):
     try: 
         data = yf.download(ticker, start=get_rolling_start_date(), end=get_rolling_end_date())
         if data.empty:
             raise ValueError
-        return data
+        return data.dropna()
     except ValueError:
         print("\033[1;31mTicker not valid, please try again.\033[0m")
         return None
@@ -50,7 +51,7 @@ while True:
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data.to_numpy())
 
-        len_of_prediction_data = 60 #Determine how many previous days data to use to make predictions (y data)
+        len_of_prediction_data = 100 #Determine how many previous days data to use to make predictions (y data)
 
         x = []
         y = []
@@ -80,7 +81,7 @@ while True:
             Dense(units=1)
         ])
 
-        epochs = 20 #Number of iterations over the data - changes graph x axis scale to match.
+        epochs = 30 #Number of iterations over the data
         model.compile(optimizer='adam', loss='mean_squared_error')
         fit_data = model.fit(x_train, y_train, epochs=epochs, batch_size=32, validation_data=(x_test, y_test))
 
@@ -138,7 +139,7 @@ while True:
 
         graph1.set_title(f'{ticker} Stock Price Prediction', fontsize=16)
         graph1.set_xlabel('Date', fontsize=12)
-        graph1.xaxis.set_major_locator(mdates.DayLocator(interval=3))
+        graph1.xaxis.set_major_locator(mdates.DayLocator(interval=7))
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
         graph1.tick_params(axis='x', rotation=45)
         graph1.set_ylabel('Price (USD)', fontsize=12)
