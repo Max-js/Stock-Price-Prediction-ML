@@ -11,7 +11,7 @@ import matplotlib.dates as mdates
 import matplotlib.gridspec as gridspec
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 #Suppress pandas future warnings and yfinance error messages in favor of local error handling
@@ -23,11 +23,12 @@ print("\033[1;32mWelcome to the Northwest Investment stock analysis tool!\033[0m
 current_datetime = datetime.now()
 
 def get_rolling_end_date():
-    return f"{current_datetime.year}-{current_datetime.month}-{current_datetime.day+1}"
+    tomorrow = current_datetime + timedelta(days=1)
+    return tomorrow.strftime("%Y-%m-%d")
 
 def get_rolling_start_date():
     start_time = current_datetime - relativedelta(years=1)
-    return f"{start_time.year}-{start_time.month}-{start_time.day}"
+    return start_time.strftime("%Y-%m-%d")
 
 def get_stock_data(ticker):
     try: 
@@ -50,7 +51,7 @@ while True:
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data.to_numpy())
 
-        len_of_prediction_data = 60 #Determine how many previous days data to use to make predictions (y data)
+        len_of_prediction_data = 100 #Determine how many previous days data to use to make predictions (y data)
 
         x = []
         y = []
