@@ -27,7 +27,7 @@ def get_rolling_end_date():
     return tomorrow.strftime("%Y-%m-%d")
 
 def get_rolling_start_date():
-    start_time = current_datetime - relativedelta(years=1)
+    start_time = current_datetime - relativedelta(years=2)
     return start_time.strftime("%Y-%m-%d")
 
 def get_stock_data(ticker):
@@ -35,7 +35,7 @@ def get_stock_data(ticker):
         data = yf.download(ticker, start=get_rolling_start_date(), end=get_rolling_end_date())
         if data.empty:
             raise ValueError
-        return data
+        return data.dropna()
     except ValueError:
         print("\033[1;31mTicker not valid, please try again.\033[0m")
         return None
@@ -81,7 +81,7 @@ while True:
             Dense(units=1)
         ])
 
-        epochs = 20 #Number of iterations over the data - changes graph x axis scale to match.
+        epochs = 30 #Number of iterations over the data
         model.compile(optimizer='adam', loss='mean_squared_error')
         fit_data = model.fit(x_train, y_train, epochs=epochs, batch_size=32, validation_data=(x_test, y_test))
 
@@ -139,7 +139,7 @@ while True:
 
         graph1.set_title(f'{ticker} Stock Price Prediction', fontsize=16)
         graph1.set_xlabel('Date', fontsize=12)
-        graph1.xaxis.set_major_locator(mdates.DayLocator(interval=3))
+        graph1.xaxis.set_major_locator(mdates.DayLocator(interval=7))
         graph1.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
         graph1.tick_params(axis='x', rotation=45)
         graph1.set_ylabel('Price (USD)', fontsize=12)
