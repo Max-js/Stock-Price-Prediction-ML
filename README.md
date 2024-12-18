@@ -2,7 +2,7 @@
 This application uses a LSTM Machine Learning model to evaluate individual stocks for buy signal.  
 
 # Future Improvements:  
-- Incorporate opening prices, potentially High and Low to get better price predictions
+- Incorporate opening prices, potentially daily high and low to get better price predictions
 - Include moving averages, RSI, MACD to improve buy signal prediction
 
 # User Guide:  
