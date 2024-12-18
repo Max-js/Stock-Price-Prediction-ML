@@ -118,11 +118,14 @@ while True:
             message = f"{ticker} is most likely not a good buy at this time."
             message_color = "red"
 
+        price_message = f"Current Price: {latest_actual_price:.2f} Predicted Price: {latest_predicted_price:.2f}"
+
         #Set up dashboard layout
         fig = plt.figure(figsize=(16, 12))
         gs = gridspec.GridSpec(2, 2, width_ratios=[2, 1], height_ratios=[1, 1], wspace=0.3, hspace=0.3)
         plot_dates = np.array(data.index[-len(y_test):])
-        fig.text(0.5, 0.95, message, ha='center', va='center', fontsize=16, color=message_color, fontweight='bold')
+        fig.text(0.5, 0.97, message, ha='center', va='center', fontsize=16, color=message_color, fontweight='bold')
+        fig.text(0.5, 0.94, price_message, ha='center', va='center', fontsize=14, color="black", fontweight='bold')
 
         #Graph 1: Plot actual vs. predicted values, buy signals
         graph1 = fig.add_subplot(gs[0, 0])
