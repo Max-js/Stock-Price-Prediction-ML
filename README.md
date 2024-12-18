@@ -1,22 +1,26 @@
 # Stock-Price-Prediction-ML
-Using a LSTM Machine Learning model to evaluate individual stocks for buy signal
+This application uses a LSTM Machine Learning model to evaluate individual stocks for buy signal.  
 
-#User Guide:
+# Future Improvements:  
+- Incorporate opening prices, potentially High and Low to get better price predictions
+- Include moving averages, RSI, MACD to improve buy signal prediction
+
+# User Guide:  
 In order to install and run this application, the following prerequisites softwares and libraries must be installed on your machine:
-•	Python 3
-•	Pip (Python package installer)
-•	Python libraries:
-o	yfinance
-o	numpy
-o	pandas
-o	sklearn
-o	matplotlib
-o	tensorflow
+- Python 3
+- Pip (Python package installer)
+- Python libraries:
+  - yfinance
+  - numpy
+  - pandas
+  - sklearn
+  - matplotlib
+  - tensorflow
 
-These libraries can all easily be installed by navigating to a terminal or command prompt and running this code snippet: 
+These libraries can all easily be installed by navigating to a terminal or command prompt and running this code snippet:  
 `pip install yfinance numpy pandas scikit-learn matplotlib tensorflow`
 
-It is also recommended to use VSCode IDE to run this application. VSCode can be downloaded here:
+It is also recommended to use VSCode IDE to run this application. VSCode can be downloaded here:  
 https://code.visualstudio.com/download
 
 Once the necessary software is downloaded:
